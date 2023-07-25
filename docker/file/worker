@@ -1,0 +1,22 @@
+# Stage 1: Runtime
+FROM huggingface/transformers-pytorch-gpu AS runtime
+
+ENV CUDA ${CUDA:-True}
+ENV CELERY_BROKER ${CELERY_BROKER:-pyamqp://guest@localhost:5672}
+ENV CELERY_BACKEND ${CELERY_BACKEND:-redis://localhost:6379}
+ENV CELERY_POOL_TYPE: ${CELERY_POOL_TYPE:-prefork}
+ENV CELERY_WORKERS: ${CELERY_WORKERS:-1}
+
+# Copy necessary data
+COPY ./src /workspace/src
+COPY ./setup.py /workspace/setup.py
+COPY ./requirements /workspace/requirements
+
+# Install packages
+RUN apt update && \
+    apt install --no-install-recommends -y build-essential gcc && \
+    pip install --no-cache-dir /workspace/".[worker]" && \
+    aifriend init --base /workspace && \
+    aifriend download-artifacts
+
+CMD aifriend worker start --pool ${CELERY_POOL_TYPE} -c ${CELERY_WORKERS} --no-daemon

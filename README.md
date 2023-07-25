@@ -1,1 +1,1 @@
-# AIfriend
+# neiroai
