@@ -16,7 +16,6 @@ COPY ./requirements /workspace/requirements
 RUN apt update && \
     apt install --no-install-recommends -y build-essential gcc && \
     pip install --no-cache-dir /workspace/".[worker]" && \
-    aifriend init --base /workspace && \
-    aifriend download-artifacts
+    aifriend init --base /workspace
 
 CMD aifriend worker start --pool ${CELERY_POOL_TYPE} -c ${CELERY_WORKERS} --no-daemon

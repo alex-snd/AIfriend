@@ -64,10 +64,15 @@ services:
       context: ../..
       dockerfile: ./docker/file/worker
 
+    env_file:
+      - ../../.env
+
     environment:
       <<: *common-env
       CELERY_POOL_TYPE: ${CELERY_POOL_TYPE:-prefork}
       CELERY_WORKERS: ${CELERY_WORKERS:-1}
+      MODEL_ID: ${MODEL_ID:-prasanna2003/opt-350m-instruct}
+      TOKENIZER_ID: ${TOKENIZER_ID:-facebook/opt-350m}
 
     volumes:
       - ../../checkpoints:/workspace/checkpoints
@@ -107,7 +112,7 @@ services:
     ports:
       - "9100:9100"
     volumes:
-      - ../../metrics/monitor/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ../../metrics/monitor/telegraf.cpu.conf:/etc/telegraf/telegraf.conf:ro
 
     restart: always
 

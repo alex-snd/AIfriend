@@ -1,0 +1,163 @@
+version: "3.3"
+
+x-common-env: &common-env
+  CUDA: ${CUDA:-True}
+  CELERY_BROKER: pyamqp://guest@rabbitmq:5672
+  CELERY_BACKEND: redis://redis:6379
+
+
+services:
+
+  dashboard:
+    container_name: dashboard
+    image: aifriend-dashboard:latest
+
+    build:
+      context: ../..
+      dockerfile: ./docker/file/dashboard
+
+    environment:
+      STREAMLIT_PORT: ${STREAMLIT_PORT:-8000}
+      FASTAPI_HOST: api
+      FASTAPI_PORT: ${FASTAPI_PORT:-8001}
+
+    ports:
+      - ${STREAMLIT_PORT:-8000}:${STREAMLIT_PORT:-8000}
+
+    restart: always
+
+    depends_on:
+      - api
+      - worker
+      - redis
+      - rabbitmq
+
+
+  api:
+    container_name: api
+    image: aifriend-api:latest
+
+    build:
+      context: ../..
+      dockerfile: ./docker/file/api
+
+    environment:
+      <<: *common-env
+      FASTAPI_PORT: ${FASTAPI_PORT:-8001}
+      FASTAPI_WORKERS: ${FASTAPI_WORKERS:-1}
+
+    ports:
+      - ${FASTAPI_PORT:-8001}:${FASTAPI_PORT:-8001}
+
+    restart: always
+
+    depends_on:
+      - worker
+      - redis
+      - rabbitmq
+
+
+  worker:
+    image: aifriend-worker:latest
+
+    build:
+      context: ../..
+      dockerfile: ./docker/file/worker
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [ gpu ]
+
+    env_file:
+      - ../../.env
+
+    environment:
+      <<: *common-env
+      CELERY_POOL_TYPE: ${CELERY_POOL_TYPE:-prefork}
+      CELERY_WORKERS: ${CELERY_WORKERS:-1}
+      MODEL_ID: ${MODEL_ID:-tiiuae/falcon-7b-instruct}
+      TOKENIZER_ID: ${TOKENIZER_ID:-tiiuae/falcon-7b-instruct}
+
+    volumes:
+      - ../../checkpoints:/workspace/checkpoints
+
+    restart: always
+
+    depends_on:
+      - redis
+      - rabbitmq
+
+
+  redis:
+    container_name: redis
+    image: ${BACKEND_IMAGE:-redis:6.2}
+
+    expose:
+      - 6379
+
+    restart: always
+
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: ${BROKER_IMAGE:-rabbitmq:3.9.8-management}
+
+    expose:
+      - 5672
+      - 15672
+
+    restart: always
+
+
+  telegraf:
+    container_name: telegraf
+    image: telegraf:1.27.2
+
+    ports:
+      - "9100:9100"
+    volumes:
+      - ../../metrics/monitor/telegraf.gpu.conf:/etc/telegraf/telegraf.conf:ro
+
+    restart: always
+
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.45.0
+
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../../metrics/prom/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
+    restart: always
+
+    depends_on:
+      - api
+      - telegraf
+
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:10.0.2
+
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../../metrics/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ../../metrics/grafana/config.ini:/etc/grafana/config.ini
+      - grafana_data:/var/lib/grafana
+
+    restart: always
+
+    depends_on:
+      - prometheus
+
+
+volumes:
+  prometheus_data: { }
+  grafana_data: { }

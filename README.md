@@ -11,5 +11,5 @@ git clone https://github.com/alex-snd/AIfriend.git  && cd aifriend
 2. Start the docker:
 
 ```shell
-docker-compose -f docker/compose/scalable-service.yml up --build
+docker-compose -f docker/compose/scalable-service.gpu.yml up --build
 ```

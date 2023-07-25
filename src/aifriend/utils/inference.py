@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 import torch
 from langchain import PromptTemplate
@@ -14,6 +14,7 @@ from transformers import (
     StoppingCriteria,
     StoppingCriteriaList,
     pipeline,
+    BitsAndBytesConfig
 )
 
 from aifriend.config import var
@@ -50,14 +51,33 @@ class CleanupOutputParser(BaseOutputParser):
 
 
 def get_llm() -> HuggingFacePipeline:
-    model = AutoModelForCausalLM.from_pretrained(
-        var.MODEL_ID,
-        trust_remote_code=True,
-        device_map="auto",
-        cache_dir=var.CHECKPOINTS_DIR,
-        offload_folder=var.OFFLOAD_DIR,
-        offload_state_dict=True,
-    )
+    if torch.cuda.is_available():
+        quantization_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_use_double_quant=True,
+        )
+
+        model = AutoModelForCausalLM.from_pretrained(
+            var.MODEL_ID,
+            trust_remote_code=True,
+            device_map="auto",
+            cache_dir=var.CHECKPOINTS_DIR,
+            offload_folder=var.OFFLOAD_DIR,
+            offload_state_dict=True,
+            quantization_config=quantization_config
+        )
+    else:
+        model = AutoModelForCausalLM.from_pretrained(
+            var.MODEL_ID,
+            trust_remote_code=True,
+            device_map="auto",
+            cache_dir=var.CHECKPOINTS_DIR,
+            offload_folder=var.OFFLOAD_DIR,
+            offload_state_dict=True,
+        )
+
     model = model.eval()
     tokenizer = AutoTokenizer.from_pretrained(var.TOKENIZER_ID, cache_dir=var.CHECKPOINTS_DIR)
     stopping_criteria = StoppingCriteriaList([StopGenerationCriteria(var.STOP_TOKENS, tokenizer, model.device)])
