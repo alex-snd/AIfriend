@@ -109,8 +109,8 @@ def talk(request: Request, payload: HumanMessage) -> Dict:
 
     Returns
     -------
-    response : AIMessage
-        AI friend response.
+    response : TalkResponse
+        Response containing the id of the celery task in the 'task_id' field.
 
     """
 
@@ -145,10 +145,7 @@ def status(request: Request,
     Returns
     -------
     response : AIMessage
-        Response containing the status of the celery task in the 'state' and 'progress'
-        fields if it's still in process,
-        error information in 'message' and 'status_code' fields if it's failed,
-        otherwise the result of keyless reading in the 'chains' field.
+        Response containing the result of text generation in the 'message' field and updated history in 'history' field.
 
     """
 

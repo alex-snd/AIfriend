@@ -10,7 +10,7 @@ def predict(self: PredictTask,
             history: List[Dict[str, Any]]
             ) -> Tuple[str, List[Dict[str, Any]]]:
     """
-    Celery task implementation that performs keyless reading.
+    Celery task implementation that performs text generation.
 
     Parameters
     ----------

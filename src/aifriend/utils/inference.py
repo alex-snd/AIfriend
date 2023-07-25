@@ -21,6 +21,8 @@ from aifriend.config import var
 
 
 class StopGenerationCriteria(StoppingCriteria):
+    """ Help to control the output and prevent the model from rambling or hallucinating questions and conversations """
+
     def __init__(self, tokens: List[List[str]], tokenizer: AutoTokenizer, device: torch.device):
         stop_token_ids = [tokenizer.convert_tokens_to_ids(t) for t in tokens]
 
@@ -37,6 +39,7 @@ class StopGenerationCriteria(StoppingCriteria):
 
 
 class CleanupOutputParser(BaseOutputParser):
+    """ Helps to remove the trailing user/human/ai string from the generated output """
     def parse(self, text: str) -> str:
         user_pattern = r"\nUser"
         text = re.sub(user_pattern, "", text)

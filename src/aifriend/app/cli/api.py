@@ -32,12 +32,12 @@ def api_state_verification(ctx: Context) -> None:
         ctx.exit(1)
 
 
-@cli.command(name='talk', help='Send keyless reading API request')
+@cli.command(name='talk', help='Send talk API request')
 def api_talk(message: str = Argument(..., help='New message for AI friend'),
              url: str = Option(var.FASTAPI_URL, help='API url')
              ) -> None:
     """
-    Send keyless reading API request.
+    Send talk API request.
 
     Parameters
     ----------
@@ -49,12 +49,6 @@ def api_talk(message: str = Argument(..., help='New message for AI friend'),
 
     import requests
     from time import time
-
-    # from rich.console import Group
-    # from rich.panel import Panel
-    # from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn, TimeElapsedColumn
-    # from rich.text import Text
-
     from aifriend.config import log
 
     payload = {

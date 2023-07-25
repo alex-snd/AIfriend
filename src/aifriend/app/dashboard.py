@@ -77,7 +77,7 @@ def sidebar() -> None:
     st.sidebar.markdown(body=
                         """
                         <p align="center">
-                        <font size="+4" color="#45B39D">Catchphrase:</font><br><font size="+4">'Wingardium Leviosa! Let's levitate some boredom and have a magical chat!'/font>
+                        <font size="+4" color="#45B39D">Catchphrase:</font><br><font size="+4">'Wingardium Leviosa! Let's levitate some boredom and have a magical chat!'</font>
                         </p>
                         """,
                         unsafe_allow_html=True)
@@ -165,6 +165,19 @@ def send(human_message: str) -> str:
 
         status = requests.get(url=f"{var.FASTAPI_URL}/status/{st.session_state.task_id}")
         status = status.json()
+
+        while status['status_code'] == HTTPStatus.PROCESSING and status['state'] != 'PREDICT':
+            if status['state'] == 'LOADING':
+                st.info('Wait a moment: Harry will wake up soon')
+                time.sleep(0.3)
+            elif status['state'] == 'PENDING':
+                st.info('Wait a moment: Harry is busy right now')
+                time.sleep(1)
+            else:
+                time.sleep(0.1)
+
+            status = requests.get(url=f'{var.FASTAPI_URL}/status/{st.session_state.task_id}')
+            status = status.json()
 
         while status["status_code"] == HTTPStatus.PROCESSING:
             st.write(f"Typing{'.' * int(time.time() % 4)}")

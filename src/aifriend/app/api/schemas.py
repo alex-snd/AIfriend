@@ -59,7 +59,7 @@ class BaseResponse(BaseModel):
 
 
 class TalkResponse(BaseResponse):
-    """ Contents declaration of the "recover" handler response body. """
+    """ Contents declaration of the "talk" handler response body. """
 
     task_id: Optional[str]
 
@@ -79,7 +79,7 @@ class TalkResponse(BaseResponse):
 
 
 class AIMessage(BaseResponse):
-    """ Contents declaration of the "talk" API handler response body. """
+    """ Contents declaration of the "status" API handler response body. """
 
     message: Optional[str]
     history: Optional[List[Dict[str, Any]]]
