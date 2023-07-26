@@ -71,9 +71,6 @@ services:
             - driver: nvidia
               capabilities: [ gpu ]
 
-    env_file:
-      - ../../.env
-
     environment:
       <<: *common-env
       CELERY_POOL_TYPE: ${CELERY_POOL_TYPE:-prefork}

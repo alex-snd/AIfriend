@@ -64,9 +64,6 @@ services:
       context: ../..
       dockerfile: ./docker/file/worker
 
-    env_file:
-      - ../../.env
-
     environment:
       <<: *common-env
       CELERY_POOL_TYPE: ${CELERY_POOL_TYPE:-prefork}
