@@ -96,7 +96,7 @@ were used to package each microservice, ensuring that they could be easily deplo
 The microservices approach enabled rapid development and deployment of the various components.
 
 
-№Conclusion
+## Conclusion
 Prior to this project, I had no hands-on experience designing chatbots, only a vague idea of how they might work under 
 the hood. Through completing this task, I've gained insight into the nuances and complexities involved in chatbot 
 development, as well as the creative possibilities. However, it was only upon compiling this report that I fully 
