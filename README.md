@@ -94,13 +94,3 @@ The project was implemented using a dockerized microservices architecture. The U
 were packaged as individual microservices, allowing for seamless integration and scalability. Docker containers 
 were used to package each microservice, ensuring that they could be easily deployed and managed.
 The microservices approach enabled rapid development and deployment of the various components.
-
-
-## Conclusion
-Prior to this project, I had no hands-on experience designing chatbots, only a vague idea of how they might work under 
-the hood. Through completing this task, I've gained insight into the nuances and complexities involved in chatbot 
-development, as well as the creative possibilities. However, it was only upon compiling this report that I fully 
-realized the core objective of this test task was likely assessing one's ability to fine-tune models and, most 
-importantly, evaluate them properly using appropriate metrics. Moving forward, I will be sure to focus more intently 
-on model optimization and validation. While my first attempt leaves room for improvement, this project has enriched my 
-understanding of chatbot capabilities and given me a foundation to build upon in the future.
